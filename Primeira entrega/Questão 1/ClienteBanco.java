@@ -20,7 +20,7 @@ public class ClienteBanco {
                     Existem três comandos disponíveis
                     Sacar
                     Depositar
-                    Ver""";
+                    Ver saldo""";
             
             System.out.println(mensagem);
            
