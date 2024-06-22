@@ -15,14 +15,13 @@ public class PonteComSincronizacao {
         carroEsquerda.start();
         carroDireita.start();
     }
-
+    // Tempo para alternar entre os carros
     static class Tempo implements Runnable {
         public void run() {
             Random gerador = new Random();
             while (true) {
                 synchronized (lock) {
-                    vez = gerador.nextInt(2);
-                    System.out.println("Alterou a via");
+                    vez = gerador.nextInt(2); // Gera um número entre 0 e 1 para escolher randomicamente quem entra na ponte (direita ou esquerda)
                     lock.notifyAll();
                 }
                 try {
@@ -45,11 +44,11 @@ public class PonteComSincronizacao {
                             e.printStackTrace();
                         }
                     }
-                    System.out.println("Carro da esquerda quer atravessar a ponte.");
-                    liberado = false; // Ocupa a ponte
+                    liberado = false;
                     System.out.println("Carro da esquerda está atravessando a ponte.");
                 }
 
+                // Tempo do carro passar na ponte
                 try {
                     Thread.sleep(3000);
                 } catch (InterruptedException e) {
@@ -76,11 +75,11 @@ public class PonteComSincronizacao {
                             e.printStackTrace();
                         }
                     }
-                    System.out.println("Carro da direita quer atravessar a ponte.");
-                    liberado = false; // Ocupa a ponte
+                    liberado = false;
                     System.out.println("Carro da direita está atravessando a ponte.");
                 }
 
+                // Tempo do carro passar na ponte
                 try {
                     Thread.sleep(3000);
                 } catch (InterruptedException e) {

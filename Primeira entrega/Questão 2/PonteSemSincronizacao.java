@@ -10,11 +10,12 @@ public class PonteSemSincronizacao {
         carroDireita.start();
     }
 
+    // Tempo para alternar entre os carros
     static class Tempo implements Runnable {
         public void run() {
             while (true) {
                 try {
-                    Thread.sleep(5000); // Espera um tempo antes de alterar a vez novamente
+                    Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -31,9 +32,10 @@ public class PonteSemSincronizacao {
             }
         }
 
+        // Tempo do carro passar na ponte
         private void atravessar() {
             try {
-                Thread.sleep(3000); // Simula o tempo de travessia
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -49,9 +51,10 @@ public class PonteSemSincronizacao {
             }
         }
 
+        // Tempo do carro passar na ponte
         private void atravessar() {
             try {
-                Thread.sleep(3000); // Simula o tempo de travessia
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
