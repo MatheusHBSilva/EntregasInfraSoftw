@@ -7,13 +7,13 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Restaurante {
     public static void main(String[] args) {
-        int capacidade = 4;
+        int capacidade = 5;
         RestauranteSala restauranteSala = new RestauranteSala(capacidade);
 
         Random rand = new Random();
 
         for (int i = 1; i <= 100; i++) {
-            Thread clienteThread = new Thread(new Cliente(restauranteSala, "Cliente " + i, rand.nextInt(5000)));
+            Thread clienteThread = new Thread(new Cliente(restauranteSala, "Cliente " + i, rand.nextInt(5000) + 1000));
             clienteThread.start();
             try {
                 Thread.sleep(rand.nextInt(500) + 500);
@@ -26,7 +26,7 @@ public class Restaurante {
 
 class RestauranteSala {
     private final Lock lock = new ReentrantLock();
-    private final Condition lugaresDisponiveis = lock.newCondition();
+    private final Condition grupoSaiu = lock.newCondition();
     private final int capacidade;
     private int clientesSentados = 0;
     private final Queue<String> filaDeEspera = new LinkedList<>();
@@ -38,10 +38,10 @@ class RestauranteSala {
     public void entrarRestaurante(String nomeCliente, int tempoJantando) throws InterruptedException {
         lock.lock();
         try {
-            while (clientesSentados == capacidade) {
+            while (clientesSentados == capacidade || (clientesSentados > 0 && !filaDeEspera.isEmpty())) {
                 System.out.println(nomeCliente + " chegou, mas todas os lugares estão ocupados. Entrando na fila de espera.");
                 filaDeEspera.add(nomeCliente);
-                lugaresDisponiveis.await();
+                grupoSaiu.await();
             }
             clientesSentados++;
             System.out.println(nomeCliente + " sentou-se. Clientes sentados: " + clientesSentados);
@@ -55,12 +55,12 @@ class RestauranteSala {
         try {
             clientesSentados--;
             System.out.println(nomeCliente + " terminou de jantar e saiu. Clientes sentados: " + clientesSentados);
-            if (!filaDeEspera.isEmpty()) {
-                String proximoCliente = filaDeEspera.poll();
-                System.out.println("Próximo cliente a sentar: " + proximoCliente);
-                lugaresDisponiveis.signal();
-            } else if (clientesSentados == 0) {
-                System.out.println("Restaurante está vazio agora.");
+            if (clientesSentados == 0) {
+                System.out.println("Todos os clientes saíram. O restaurante está vazio agora.");
+                while (!filaDeEspera.isEmpty()) {
+                    filaDeEspera.poll();
+                }
+                grupoSaiu.signalAll();
             }
         } finally {
             lock.unlock();
